@@ -5,6 +5,14 @@ const app = express();
 const port = 8080;
 const connection = require('./database');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+// Session middleware setup
+app.use(session({
+    secret: 'mySystem', 
+    resave: false,
+    saveUninitialized: false, 
+    cookie: { secure: false } 
+}));
 
 // Middleware to parse form data
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -246,12 +254,10 @@ app.post('/student_login', function(req, res) {
         }
         
         if (results.length > 0) {
-            // login successful
+            req.session.studentID = results[0].UserID; 
             console.log("Student Authorized!");
             res.redirect('/homepage');
-            // res.send("Login successful!");
         } else {
-            // authentication failed
             console.log("Authentication failed. Check username/password.");
             res.status(401).send("Invalid username or password");
         }
