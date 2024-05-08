@@ -97,6 +97,60 @@ connection.connect(function(err) {
                 console.log("Teachers Table created");
                 });
 
+                // Create the Menu table
+                const createMenuTable = `
+                        CREATE TABLE IF NOT EXISTS MenuItems (
+                        ItemID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+                        ItemName VARCHAR(225) NOT NULL UNIQUE,  
+                        BudgetAllocated INT
+                    )`;
+                connection.query(createMenuTable, function (err) {
+                    if (err) {
+                        console.error("Error creating MenuItems table: ", err);
+                        return;
+                    }
+                    console.log("MenuItems Table created");
+                });
+
+                // Create the Performance table
+                const createPerfTable = `
+                        CREATE TABLE IF NOT EXISTS Performance (
+                        PerformanceID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+                        Title VARCHAR(225) NOT NULL UNIQUE,  
+                        Duration TIME,
+                        Special_Requirements VARCHAR(225),
+                        PerformanceStatus ENUM('Proposed', 'Accepted') NOT NULL,
+                        StudentID INT NOT NULL,  
+                        FOREIGN KEY (StudentID) REFERENCES Students(StudentID)
+                        
+                    )`;
+                connection.query(createPerfTable, function (err) {
+                    if (err) {
+                        console.error("Error creating Performance table: ", err);
+                        return;
+                    }
+                    console.log("Performance Table created");
+                });
+
+                 // Create the Suggestion table
+                 const createSuggestionTable = `
+                    CREATE TABLE IF NOT EXISTS StudentSuggestion (
+                    StudentID INT NOT NULL,
+                    ItemID INT NOT NULL,
+                    PRIMARY KEY (StudentID, ItemID),
+                    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+                    FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)
+                 
+             )`;
+         connection.query(createSuggestionTable, function (err) {
+             if (err) {
+                 console.error("Error creating StudentSuggestion table: ", err);
+                 return;
+             }
+             console.log("StudentSuggestion Table created");
+         });
+
+
                     // Define the user_logging trigger
                     // const createUserLoggingTrigger = `
                     //     CREATE TRIGGER user_logging
@@ -194,7 +248,8 @@ app.post('/student_login', function(req, res) {
         if (results.length > 0) {
             // login successful
             console.log("Student Authorized!");
-            res.send("Login successful!");
+            res.redirect('/homepage');
+            // res.send("Login successful!");
         } else {
             // authentication failed
             console.log("Authentication failed. Check username/password.");
@@ -230,3 +285,36 @@ app.post('/teacher_login', function(req, res) {
         }
     });
 });
+
+// Open main home page for client(student)
+app.get('/homepage', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/student_dashboard.html'));
+});
+
+
+// Open menu page for client(student)
+app.get('/food_selection', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/menu.html'));
+});
+
+
+app.post('/submit_vote', function(req, res) {
+    const studentID = req.session.studentID; 
+    const items = req.body.itemID;
+
+    // Handle single and multiple item submissions
+    const itemIDs = Array.isArray(items) ? items : [items];
+
+    itemIDs.forEach((itemID) => {
+        const studentFoodVote = 'INSERT INTO StudentSuggestions (StudentID, ItemID) VALUES (?, ?)';
+        connection.query(studentFoodVote, [studentID, itemID], function(err, result) {
+            if (err) {
+                console.error('Failed to insert vote:', err);
+                return res.status(500).send("Error processing your vote.");
+            }
+        });
+    });
+
+    res.send("Vote successfully recorded!");
+});
+
