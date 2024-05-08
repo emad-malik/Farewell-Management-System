@@ -298,6 +298,40 @@ app.get('/homepage', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/student_dashboard.html'));
 });
 
+// Open menu management page for client(student)
+app.get('/food_modification', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/menu_management.html')); 
+});
+
+app.post('/modify_menu', function(req, res) {
+    const { choice, newItemName, newItemPrice, deleteItemName } = req.body;
+    
+    if (choice === 'add') {
+        // add a new item
+        const insertNewItem = 'INSERT INTO MenuItems (ItemName, BudgetAllocated) VALUES (?, ?)';
+        connection.query(insertNewItem, [newItemName, newItemPrice], function(err) {
+            if (err) {
+                console.error('Failed to add new menu item:', err);
+                return res.status(500).send("Error adding new menu item.");
+            }
+           
+            res.redirect('/food_selection');
+        });
+    } 
+    else if (choice === 'delete') 
+    {
+        // delete an exsisting item
+        const deleteItem = 'DELETE FROM MenuItems WHERE ItemName = ?';
+        connection.query(deleteItem, [deleteItemName], function(err) {
+            if (err) {
+                console.error('Failed to delete menu item:', err);
+                return res.status(500).send("Error deleting menu item.");
+            }
+            
+            res.redirect('/food_selection');
+        });
+    }
+});
 
 // Open menu page for client(student)
 app.get('/food_selection', function(req, res) {
@@ -332,8 +366,6 @@ app.post('/submit_vote', async function(req, res) {
     const items = req.body;
     console.log("Items Received:", items);
 
-    // Assuming the items are named with their type as the key and their names as the values
-    // Example: {appetizer: "Russian Salad - Rs.250", mainCourse: "Alfredo Pasta - Rs.950"}
     try {
         for (let type in items) {
             let itemName = items[type];
@@ -356,7 +388,6 @@ app.post('/submit_vote', async function(req, res) {
     }
 });
 
-// Helper function to promisify the MySQL query
 function queryAsync(query, params) {
     return new Promise((resolve, reject) => {
         connection.query(query, params, (err, results) => {
@@ -365,3 +396,5 @@ function queryAsync(query, params) {
         });
     });
 }
+
+
