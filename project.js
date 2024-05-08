@@ -256,6 +256,7 @@ app.post('/student_login', function(req, res) {
         if (results.length > 0) {
             req.session.studentID = results[0].UserID; 
             console.log("Student Authorized!");
+            console.log("Session StudentID set:", req.session.studentID);
             res.redirect('/homepage');
         } else {
             console.log("Authentication failed. Check username/password.");
@@ -323,4 +324,3 @@ app.post('/submit_vote', function(req, res) {
 
     res.send("Vote successfully recorded!");
 });
-
