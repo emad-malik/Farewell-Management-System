@@ -305,22 +305,63 @@ app.get('/food_selection', function(req, res) {
 });
 
 
-app.post('/submit_vote', function(req, res) {
+// app.post('/submit_vote', function(req, res) {
+//     const studentID = req.session.studentID; 
+//     const items = req.body.itemID;
+
+//     // Handle single and multiple item submissions
+//     const itemIDs = Array.isArray(items) ? items : [items];
+
+//     itemIDs.forEach((itemID) => {
+//         const studentFoodVote = 'INSERT INTO StudentSuggestions (StudentID, ItemID) VALUES (?, ?)';
+//         connection.query(studentFoodVote, [studentID, itemID], function(err, result) {
+//             if (err) {
+//                 console.error('Failed to insert vote:', err);
+//                 return res.status(500).send("Error processing your vote.");
+//             }
+//         });
+//     });
+
+//     res.send("Vote successfully recorded!");
+// });
+
+
+
+app.post('/submit_vote', async function(req, res) {
     const studentID = req.session.studentID; 
-    const items = req.body.itemID;
+    const items = req.body;
+    console.log("Items Received:", items);
 
-    // Handle single and multiple item submissions
-    const itemIDs = Array.isArray(items) ? items : [items];
+    // Assuming the items are named with their type as the key and their names as the values
+    // Example: {appetizer: "Russian Salad - Rs.250", mainCourse: "Alfredo Pasta - Rs.950"}
+    try {
+        for (let type in items) {
+            let itemName = items[type];
+            let itemBudget = parseInt(itemName.split("- Rs.")[1]); // Extracting price from the string
+            let itemNameClean = itemName.split(" - Rs.")[0];
 
-    itemIDs.forEach((itemID) => {
-        const studentFoodVote = 'INSERT INTO StudentSuggestions (StudentID, ItemID) VALUES (?, ?)';
-        connection.query(studentFoodVote, [studentID, itemID], function(err, result) {
-            if (err) {
-                console.error('Failed to insert vote:', err);
-                return res.status(500).send("Error processing your vote.");
-            }
+            // Insert into MenuItems
+            const insertQuery = "INSERT INTO MenuItems (ItemName, BudgetAllocated) VALUES (?, ?)";
+            const result = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
+
+            // Insert into StudentSuggestion
+            const suggestionQuery = "INSERT INTO StudentSuggestion (StudentID, ItemID) VALUES (?, ?)";
+            await queryAsync(suggestionQuery, [studentID, result.insertId]);
+        }
+
+        res.send("Vote successfully recorded!");
+    } catch (err) {
+        console.error('Failed to process vote:', err);
+        res.status(500).send("Error processing your vote.");
+    }
+});
+
+// Helper function to promisify the MySQL query
+function queryAsync(query, params) {
+    return new Promise((resolve, reject) => {
+        connection.query(query, params, (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
         });
     });
-
-    res.send("Vote successfully recorded!");
-});
+}
