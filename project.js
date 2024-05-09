@@ -157,6 +157,22 @@ connection.connect(function(err) {
              }
              console.log("StudentSuggestion Table created");
          });
+            // Create the Assignment table
+            const createAssignmentTable = `
+                CREATE TABLE IF NOT EXISTS TaskAssignment (
+                TaskID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+                TaskDetails VARCHAR(255),
+                AssignedBy INT NOT NULL,
+                AssignedTo VARCHAR(50) NOT NULL,
+                FOREIGN KEY (AssignedBy) REFERENCES SystemUser(UserID)
+            )`;
+ connection.query(createAssignmentTable, function (err) {
+     if (err) {
+         console.error("Error creating TaskAssignment table: ", err);
+         return;
+     }
+     console.log("TaskAssignment Table created");
+ });
 
 
                     // Define the user_logging trigger
@@ -303,6 +319,7 @@ app.get('/food_modification', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/menu_management.html')); 
 });
 
+// Endpoint to handle menu modification
 app.post('/modify_menu', function(req, res) {
     const { choice, newItemName, newItemPrice, deleteItemName } = req.body;
     
@@ -360,7 +377,7 @@ app.get('/food_selection', function(req, res) {
 // });
 
 
-
+// Endpoint to handle vote submission
 app.post('/submit_vote', async function(req, res) {
     const studentID = req.session.studentID; 
     const items = req.body;
@@ -398,3 +415,43 @@ function queryAsync(query, params) {
 }
 
 
+// Open task assignment page for client
+app.get('/assignments', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/task_assignment.html')); 
+});
+
+// Endpoint to handle task assignment
+app.post('/assign_task', function(req, res) {
+    // Parse sessionID of user logged in
+    const assignedBy = req.session.studentID;
+    const { taskDetails, assignedTo } = req.body;
+    // Check is user is signed in, and verify fields of the form
+    if (!assignedBy) 
+    {
+        return res.status(401).send("You must be logged in to assign tasks.");
+    }
+    if (!taskDetails || !assignedTo) 
+    {
+        return res.status(400).send("Task details and assigned team are required.");
+    }
+    const insertTaskQuery = `
+        INSERT INTO TaskAssignment (TaskDetails, AssignedBy, AssignedTo) 
+        VALUES (?, ?, ?)
+    `;
+    // AssignedBy and To columns take in the ID of user who assigned the task and the team to whom the task is assigned respectively
+    connection.query(insertTaskQuery, [taskDetails, assignedBy, assignedTo], function(err, result) {
+        if (err) 
+        {
+            console.error('Failed to insert new task:', err);
+            return res.status(500).send("Error adding new task.");
+        }
+        // res.redirect('/progress_tracker'); go to this page afer tasks are assigned
+    });
+});
+
+
+
+// Open view updates page for client
+app.get('/view_updates', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/updates.html')); 
+});
