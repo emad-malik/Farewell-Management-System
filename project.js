@@ -6,6 +6,8 @@ const port = 8080;
 const connection = require('./database');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 // Session middleware setup
 app.use(session({
     secret: 'mySystem', 
@@ -453,5 +455,12 @@ app.post('/assign_task', function(req, res) {
 
 // Open view updates page for client
 app.get('/view_updates', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public/updates.html')); 
+    const query = "SELECT TaskDetails FROM TaskAssignment";
+    connection.query(query, function(err, results) {
+        if (err) {
+            console.error('Failed to retrieve tasks:', err);
+            return res.status(500).send("Error retrieving tasks.");
+        }
+        res.render('updates', { tasks: results });
+    });
 });
