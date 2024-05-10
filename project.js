@@ -142,6 +142,39 @@ connection.connect(function(err) {
                     console.log("Performance Table created");
                 });
 
+                // Create the Venue table
+                const createVenueTable = `
+                    CREATE TABLE IF NOT EXISTS Venue (
+                    VenueID int AUTO_INCREMENT primary key NOT NULL,
+                    VenueName varchar(225) NOT NULL,
+                    Address varchar(225) NOT NULL,
+                    Capacity int NOT NULL
+        )`;
+        connection.query(createVenueTable, function (err) {
+            if (err) {
+                console.error("Error creating Venue table: ", err);
+                return;
+            }
+            console.log("Venue Table created");
+        });
+        
+            // Create the Events table
+            const createEventsTable = `
+                CREATE TABLE IF NOT EXISTS Events (
+                EventID int AUTO_INCREMENT primary key NOT NULL,
+                EventName varchar(225) NOT NULL,
+                EventDate DATE NOT NULL,
+                VenueID int ,
+                FOREIGN KEY (VenueID) REFERENCES Venue(VenueID)
+        )`;
+        connection.query(createEventsTable, function (err) {
+        if (err) {
+            console.error("Error creating Events table: ", err);
+            return;
+        }
+        console.log("Events Table created");
+        });
+
                  // Create the Suggestion table
                  const createSuggestionTable = `
                     CREATE TABLE IF NOT EXISTS StudentSuggestion (
@@ -190,6 +223,26 @@ connection.connect(function(err) {
                 return;
             }
             console.log("Announcements Table created");
+        });
+
+            // Create the Budget table
+            const createBudgetTable = `
+                CREATE TABLE IF NOT EXISTS Budget (
+                BudgetID INT AUTO_INCREMENT PRIMARY KEY,
+                AllocatedAmount DECIMAL(10, 2) NOT NULL,
+                Category VARCHAR(100) NOT NULL,
+                Description TEXT,
+                EventID INT,
+                ItemID INT,
+                FOREIGN KEY (EventID) REFERENCES Events(EventID),
+                FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)
+        )`;
+        connection.query(createBudgetTable, function (err) {
+            if (err) {
+                console.error("Error creating Budget table: ", err);
+                return;
+            }
+            console.log("Budget Table created");
         });
 
 
