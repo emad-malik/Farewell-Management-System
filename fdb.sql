@@ -37,12 +37,10 @@ CREATE TABLE IF NOT EXISTS Students (
 	StudentID int AUTO_INCREMENT PRIMARY KEY NOT NULL,
     StuFamilyMembers int,
     DietaryPreference ENUM('Vegan', 'Non-Vegan') NOT NULL,
-    StudentRole NOT NULL,
     UserID int,
     FOREIGN KEY (UserID) REFERENCES SystemUser(UserID)
     
 );
-
 CREATE TABLE IF NOT EXISTS Teachers (
 	TeacherID int AUTO_INCREMENT primary key NOT NULL,
     TeFamilyMembers int,
@@ -51,11 +49,91 @@ CREATE TABLE IF NOT EXISTS Teachers (
 );
 
 
-    
+CREATE TABLE IF NOT EXISTS Venue (
+	VenueID int AUTO_INCREMENT primary key NOT NULL,
+    VenueName varchar(225) NOT NULL,
+	Address varchar(225) NOT NULL,
+	Capacity int NOT NULL
+);
 
-    
-    
-    
+
+CREATE TABLE IF NOT EXISTS Events (
+	EventID int AUTO_INCREMENT primary key NOT NULL,
+    EventName varchar(225) NOT NULL,
+    EventDate DATE NOT NULL,
+    VenueID int ,
+    FOREIGN KEY (VenueID) REFERENCES Venue(VenueID)
+
+);#need to make VanueID NOT NULL in this as there is total particapation from venue. User alter statement
+
+CREATE TABLE IF NOT EXISTS Performance (
+    PerformanceID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    Title VARCHAR(225) NOT NULL UNIQUE,  
+    Duration TIME,
+    Special_Requirements VARCHAR(225),
+    PerformanceStatus ENUM('Proposed', 'Accepted') NOT NULL,
+    StudentID INT NOT NULL,  -- total participation
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID)
+);
 
 
 
+/*
+CREATE VIEW Vote_Count_View AS
+SELECT s.StudentID, COUNT(p.PerformanceID) AS Vote_Count
+FROM Students s
+LEFT JOIN Performance p ON s.StudentID = p.StudentID
+GROUP BY s.StudentID;
+*/#THIS IS TO BE EXCUTED TO FIND THE VOTE_COUNT OF EACH EMPLOYEE AND CREATE A VIEW FOR THAT ATTRIBUTE
+
+CREATE TABLE IF NOT EXISTS MenuItems (
+    ItemID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    ItemName VARCHAR(225) NOT NULL UNIQUE,  
+    BudgetAllocated INT
+);
+
+
+CREATE TABLE IF NOT EXISTS StudentSuggestion (
+	StudentID INT NOT NULL,
+	ItemID INT NOT NULL,
+	PRIMARY KEY (StudentID, ItemID),
+	FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+	FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)
+);
+
+CREATE TABLE IF NOT EXISTS RegistersFor(
+	EventID INT NOT NULL,
+    StudentID INT NOT NULL,
+    PRIMARY KEY (StudentID, EventID),
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID)
+    
+);
+
+CREATE TABLE Budget (
+    BudgetID INT AUTO_INCREMENT PRIMARY KEY,
+    AllocatedAmount DECIMAL(10, 2) NOT NULL,
+    Category VARCHAR(100) NOT NULL,
+    Description TEXT,
+    EventID INT,
+    ItemID INT,
+    FOREIGN KEY (EventID) REFERENCES Events(EventID),
+    FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)
+);
+
+
+CREATE TABLE IF NOT EXISTS TaskAssignment (
+    TaskID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    TaskDetails VARCHAR(255),
+    AssignedBy INT NOT NULL,
+    AssignedTo VARCHAR(50) NOT NULL,
+    FOREIGN KEY (AssignedBy) REFERENCES SystemUser(UserID)
+);
+
+
+CREATE TABLE IF NOT EXISTS Announcements (
+    AnnouncementID INT AUTO_INCREMENT PRIMARY KEY,
+    AnnouncementDetails VARCHAR(255) NOT NULL,
+    AnnouncedBy INT,
+    FOREIGN KEY (AnnouncedBy) REFERENCES SystemUser(UserID)
+);
