@@ -168,13 +168,29 @@ connection.connect(function(err) {
                 AssignedTo VARCHAR(50) NOT NULL,
                 FOREIGN KEY (AssignedBy) REFERENCES SystemUser(UserID)
             )`;
- connection.query(createAssignmentTable, function (err) {
-     if (err) {
-         console.error("Error creating TaskAssignment table: ", err);
-         return;
-     }
-     console.log("TaskAssignment Table created");
- });
+            connection.query(createAssignmentTable, function (err) {
+                if (err) {
+                    console.error("Error creating TaskAssignment table: ", err);
+                    return;
+                }
+                console.log("TaskAssignment Table created");
+            });
+
+            // Create the Announcements table
+            const createAnnTable = `
+                CREATE TABLE IF NOT EXISTS Announcements (
+                AnnouncementID INT AUTO_INCREMENT PRIMARY KEY,
+                AnnouncementDetails VARCHAR(255) NOT NULL,
+                AnnouncedBy INT,
+                FOREIGN KEY (AnnouncedBy) REFERENCES SystemUser(UserID)   
+        )`;
+        connection.query(createAnnTable, function (err) {
+            if (err) {
+                console.error("Error creating Announcements table: ", err);
+                return;
+            }
+            console.log("Announcements Table created");
+        });
 
 
                     // Define the user_logging trigger
@@ -452,15 +468,60 @@ app.post('/assign_task', function(req, res) {
 });
 
 
+// Open add announcement page for client
+app.get('/announcements', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/add_announcement.html')); 
+});
 
-// Open view updates page for client
-app.get('/view_updates', function(req, res) {
-    const query = "SELECT TaskDetails FROM TaskAssignment";
-    connection.query(query, function(err, results) {
-        if (err) {
-            console.error('Failed to retrieve tasks:', err);
-            return res.status(500).send("Error retrieving tasks.");
+// Endpoint to handle announcements
+app.post('/submit_announcement', function(req, res) {
+    // Parse sessionID of user logged in
+    const announcedBy = req.session.studentID;
+    const { announcementDetails } = req.body;
+    // Check is user is signed in, and verify fields of the form
+    if (!announcedBy) 
+    {
+        return res.status(401).send("You must be logged in to make announcements.");
+    }
+    if (!announcementDetails) 
+    {
+        return res.status(400).send("Please add something.");
+    }
+    const insertAnnQuery = `
+        INSERT INTO Announcements (AnnouncementDetails, AnnouncedBy) 
+        VALUES (?, ?)
+    `;
+    // AnnouncedBy takes in the ID of user who made the announcement 
+    connection.query(insertAnnQuery, [announcementDetails, announcedBy], function(err, result) {
+        if (err) 
+        {
+            console.error('Failed to insert announcement:', err);
+            return res.status(500).send("Error adding announcement.");
         }
-        res.render('updates', { tasks: results });
+        res.status(200).send("Announcement has been added successfully.");
+        // res.redirect('/'); go somewhere idk
     });
 });
+
+// Open view updates page for client which will render updates and announcements
+app.get('/view_updates', function(req, res) {
+    const taskQuery= "SELECT TaskDetails FROM TaskAssignment";
+    const announcementQuery= "SELECT AnnouncementDetails FROM Announcements";
+    
+    connection.query(taskQuery, function(taskErr, taskResults) {
+        if (taskErr) {
+            console.error('Failed to retrieve tasks:', taskErr);
+            return res.status(500).send("Error retrieving tasks.");
+        }
+
+        connection.query(announcementQuery, function(announcementErr, announcementResults) {
+            if (announcementErr) {
+                console.error('Failed to retrieve announcements:', announcementErr);
+                return res.status(500).send("Error retrieving announcements.");
+            }
+
+            res.render('updates', { tasks: taskResults, announcements: announcementResults });
+        });
+    });
+});
+
