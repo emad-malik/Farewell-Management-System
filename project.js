@@ -343,7 +343,7 @@ app.post('/student_login', function(req, res) {
         if (results.length > 0) {
             req.session.studentID = results[0].UserID; 
             console.log("Student Authorized!");
-            console.log("Session StudentID set:", req.session.studentID);
+            console.log("Session UserID set:", req.session.studentID);
             res.redirect('/homepage');
         } else {
             console.log("Authentication failed. Check username/password.");
@@ -371,7 +371,7 @@ app.post('/teacher_login', function(req, res) {
         if (results.length > 0) {
             // login successful
             console.log("Teacher authorized!");
-            res.send("Login successful!");
+            res.redirect('/teacher_homepg');
         } else {
             // authentication failed
             console.log("Authentication failed. Check username/password.");
@@ -383,6 +383,11 @@ app.post('/teacher_login', function(req, res) {
 // Open main home page for client(student)
 app.get('/homepage', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/student_dashboard.html'));
+});
+
+// Open main home page for client(student)
+app.get('/teacher_homepg', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/teacher_dashboard.html'));
 });
 
 // Open menu management page for client(student)
@@ -678,6 +683,80 @@ app.post('/submit_performance', (req, res) => {
             }
             console.log('New performance proposed');
             res.send('New performance proposed');
+        });
+    });
+});
+
+// Open event reg event page for teacher
+app.get('/teacherEvent_reg', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/teacher_event.html')); 
+});
+
+// Endpoint to handle teacher event registration
+app.post('/teacher_event_registration', function(req, res) {
+    const { teacherID, teacherName, familyMembers } = req.body;
+
+    const checkTeacher = 'SELECT * FROM Teachers WHERE TeacherID = ?';
+    connection.query(checkTeacher, [teacherID], (err, results) => {
+        if (err) {
+            console.error('Database error while checking teacher:', err);
+            res.status(500).send('Error checking teacher');
+            return;
+        }
+
+        if (results.length === 0) {
+            res.status(404).send('Teacher ID not found');
+            return;
+        }
+
+        const updateTeacherDetailsQuery = 'UPDATE Teachers SET TeacherName = ?, TeFamilyMembers = ? WHERE TeacherID = ?';
+        connection.query(updateTeacherDetailsQuery, [teacherName, familyMembers, teacherID], (err, result) => {
+            if (err) {
+                console.error('Database error while updating teacher details:', err);
+                res.status(500).send('Error updating teacher details');
+                return;
+            }
+
+            console.log('Teacher details updated successfully');
+            res.send('Teacher details updated successfully');
+        });
+    });
+});
+
+
+// Open event reg page for teacher
+app.get('/studentEvent_reg', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/student_event.html')); 
+});
+
+
+// Endpoint to handle student event registration
+app.post('/student_event_registration', function(req, res) {
+    const { studentID, studentName, familyMembers } = req.body;
+
+    const checkStudent = 'SELECT * FROM Students WHERE StudentID = ?';
+    connection.query(checkStudent, [studentID], (err, results) => {
+        if (err) {
+            console.error('Database error while checking student:', err);
+            res.status(500).send('Error checking student');
+            return;
+        }
+
+        if (results.length === 0) {
+            res.status(404).send('Student ID not found');
+            return;
+        }
+
+        const updateTeacherDetailsQuery = 'UPDATE Students SET StudentName = ?, StuFamilyMembers = ? WHERE StudentID = ?';
+        connection.query(updateTeacherDetailsQuery, [studentName, familyMembers, studentID], (err, result) => {
+            if (err) {
+                console.error('Database error while updating student details:', err);
+                res.status(500).send('Error updating student details');
+                return;
+            }
+
+            console.log('Student details updated successfully');
+            res.send('Student details updated successfully');
         });
     });
 });
