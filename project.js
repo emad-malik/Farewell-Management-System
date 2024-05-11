@@ -178,13 +178,12 @@ connection.connect(function(err) {
                  // Create the Suggestion table
                  const createSuggestionTable = `
                     CREATE TABLE IF NOT EXISTS StudentSuggestion (
-                    StudentID INT NOT NULL,
+                    UserID INT NOT NULL,
                     ItemID INT NOT NULL,
-                    PRIMARY KEY (StudentID, ItemID),
-                    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
-                    FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)
-                 
-             )`;
+                    PRIMARY KEY (UserID, ItemID),
+                    FOREIGN KEY (UserID) REFERENCES Students(UserID),
+                    FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)                 
+                )`;
          connection.query(createSuggestionTable, function (err) {
              if (err) {
                  console.error("Error creating StudentSuggestion table: ", err);
@@ -470,7 +469,7 @@ app.post('/submit_vote', async function(req, res) {
             const result = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
 
             // Insert into StudentSuggestion
-            const suggestionQuery = "INSERT INTO StudentSuggestion (StudentID, ItemID) VALUES (?, ?)";
+            const suggestionQuery = "INSERT INTO StudentSuggestion (UserID, ItemID) VALUES (?, ?)";
             await queryAsync(suggestionQuery, [studentID, result.insertId]);
         }
 
