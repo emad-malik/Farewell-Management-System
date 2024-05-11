@@ -124,14 +124,14 @@ connection.connect(function(err) {
 
                 // Create the Performance table
                 const createPerfTable = `
-                        CREATE TABLE IF NOT EXISTS Performance (
-                        PerformanceID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-                        Title VARCHAR(225) NOT NULL UNIQUE,  
-                        Duration TIME,
-                        Special_Requirements VARCHAR(225),
-                        PerformanceStatus ENUM('Proposed', 'Accepted') NOT NULL,
-                        StudentID INT NOT NULL,  
-                        FOREIGN KEY (StudentID) REFERENCES Students(StudentID)
+                    CREATE TABLE IF NOT EXISTS Performance (
+                    PerformanceID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+                    Title VARCHAR(225) NOT NULL UNIQUE,  
+                    Duration TIME,
+                    Special_Requirements VARCHAR(225),
+                    PerformanceStatus ENUM('Proposed', 'Accepted') NOT NULL,
+                    UserID INT NOT NULL,  
+                    FOREIGN KEY (UserID) REFERENCES Students(UserID)
                         
                     )`;
                 connection.query(createPerfTable, function (err) {
@@ -638,5 +638,46 @@ app.post('/adjust_budget', function(req, res) {
             return res.status(500).send("Error adjusting budget.");
         }
         res.send("Budget adjusted successfully.");
+    });
+});
+
+// Open performance proposal page for client
+app.get('/manage_performance', function (req, res) {
+    res.sendFile(path.join(__dirname, 'public/propose_performance.html'));
+});
+
+
+// Endpoint to handle proposal submission
+app.post('/submit_performance', (req, res) => {
+    const { title, duration, specialRequirements } = req.body;
+    const studentID = req.session.studentID; 
+
+    // Check if the studentID exists in the Students table
+    const checkStudentSql = 'SELECT 1 FROM Students WHERE UserID = ?';
+    connection.query(checkStudentSql, [studentID], (err, result) => {
+        if (err) {
+            console.error('Database error while checking student:', err);
+            res.status(500).send('Error checking student');
+            return;
+        }
+
+        if (result.length === 0) {
+            res.status(404).send('Student not found');
+            return;
+        }
+
+        // Insert performance if student exists
+        const sql = 'INSERT INTO Performance (Title, Duration, Special_Requirements, PerformanceStatus, UserID) VALUES (?, ?, ?, ?, ?)';
+        const values = [title, duration, specialRequirements, 'Proposed', studentID];
+
+        connection.query(sql, values, (err, result) => {
+            if (err) {
+                console.error('Database error while inserting performance:', err);
+                res.status(500).send('Error inserting performance');
+                return;
+            }
+            console.log('New performance proposed');
+            res.send('New performance proposed');
+        });
     });
 });
