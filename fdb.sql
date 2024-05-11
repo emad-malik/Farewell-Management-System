@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS Teachers (
     FOREIGN KEY (UserID) REFERENCES SystemUser(UserID)
 );
 
+ALTER TABLE Teachers ADD TeacherName VARCHAR(30) AFTER TeacherID;
+ALTER TABLE Students ADD StudentName VARCHAR(30) AFTER StudentID;
+
 
 CREATE TABLE IF NOT EXISTS Venue (
 	VenueID int AUTO_INCREMENT primary key NOT NULL,
@@ -61,10 +64,11 @@ CREATE TABLE IF NOT EXISTS Events (
 	EventID int AUTO_INCREMENT primary key NOT NULL,
     EventName varchar(225) NOT NULL,
     EventDate DATE NOT NULL,
-    VenueID int ,
+    VenueID int,
     FOREIGN KEY (VenueID) REFERENCES Venue(VenueID)
 
 );#need to make VanueID NOT NULL in this as there is total particapation from venue. User alter statement
+ALTER TABLE Events ADD EventBudget INT;
 
 CREATE TABLE IF NOT EXISTS Performance (
     PerformanceID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -72,11 +76,12 @@ CREATE TABLE IF NOT EXISTS Performance (
     Duration TIME,
     Special_Requirements VARCHAR(225),
     PerformanceStatus ENUM('Proposed', 'Accepted') NOT NULL,
-    StudentID INT NOT NULL,  -- total participation
-    FOREIGN KEY (StudentID) REFERENCES Students(StudentID)
+	UserID INT NOT NULL,  
+    FOREIGN KEY (UserID) REFERENCES Students(UserID)
 );
 
-
+ALTER TABLE Performance DROP FOREIGN KEY performance_ibfk_1;
+ALTER TABLE Performance DROP COLUMN StudentID;
 
 /*
 CREATE VIEW Vote_Count_View AS
@@ -107,7 +112,6 @@ CREATE TABLE IF NOT EXISTS RegistersFor(
     PRIMARY KEY (StudentID, EventID),
     FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
     FOREIGN KEY (EventID) REFERENCES Events(EventID)
-    
 );
 
 CREATE TABLE Budget (
@@ -137,3 +141,32 @@ CREATE TABLE IF NOT EXISTS Announcements (
     AnnouncedBy INT,
     FOREIGN KEY (AnnouncedBy) REFERENCES SystemUser(UserID)
 );
+
+-- stored procedure for dinner menu budget
+DELIMITER $$
+CREATE PROCEDURE MenuBudgetThreshold()
+BEGIN
+	DECLARE TotalAllocated DECIMAL(10, 2);
+    DECLARE DinnerThreshold DECIMAL(10, 2);
+    SELECT SUM(BudgetAllocated) INTO totalAllocated FROM MenuItems; -- total allocation from menu table
+    SELECT AllocatedAmount INTO DinnerThreshold FROM Budget WHERE Category = 'Dinner'; -- allocation for dinner menu
+    IF TotalAllocated > DinnerThreshold THEN
+		INSERT INTO Announcements (AnnouncementDetails, AnnouncedBy)
+		VALUES ('Budget threshold exceeded for Dinner category! Keep it low!', 1);
+	END IF;
+END $$
+DELIMITER ;
+    
+CALL MenuBudgetThreshold();
+
+
+-- SELECT CONSTRAINT_NAME
+-- FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+-- WHERE TABLE_NAME = 'StudentSuggestion' AND COLUMN_NAME = 'StudentID';
+
+--  ALTER TABLE StudentSuggestion DROP FOREIGN KEY studentsuggestion_ibfk_1;
+
+-- ALTER TABLE StudentSuggestion ADD FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+
+
+DELETE FROM MenuItems;
