@@ -647,7 +647,7 @@ app.post('/adjust_budget', function(req, res) {
 });
 
 // Open performance proposal page for client
-app.get('/manage_performance', function (req, res) {
+app.get('/view_performance', function (req, res) {
     res.sendFile(path.join(__dirname, 'public/propose_performance.html'));
 });
 
@@ -686,6 +686,31 @@ app.post('/submit_performance', (req, res) => {
         });
     });
 });
+
+// Open manage performance page for client
+app.get('/view_perf_management', function (req, res) {
+    res.sendFile(path.join(__dirname, 'public/manage_performance.html'));
+});
+
+// Endpoint to handle performance management
+app.post('/manage_performances', function (req, res) {
+    const performanceID = req.body.performanceID;
+    const newStatus = req.body.status;
+
+    // Updating performance status using UPDATE query
+    const updateStatus = `UPDATE Performance SET PerformanceStatus = ? WHERE PerformanceID = ?`;
+
+    connection.query(updateStatus, [newStatus, performanceID], (err, result) => {
+        if (err) {
+            console.error('Error updating performance status: ' + err.message);
+            res.status(500).send('Error updating performance status');
+            return;
+        }
+        console.log('Performance status updated successfully');
+        res.send(`Performance ID ${performanceID} status changed to ${newStatus}`);
+    });
+});
+
 
 // Open event reg event page for teacher
 app.get('/teacherEvent_reg', function(req, res) {
