@@ -578,3 +578,22 @@ app.get('/view_updates', function(req, res) {
     });
 });
 
+
+// Open budget page for client
+app.get('/budget', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/budget_view.html')); 
+});
+
+// Open expense tracking page for client which will render expenses for menu, events etc
+app.get('/view_expenses', function(req, res) {
+    const expenseMenuQuery= "SELECT SUM(BudgetAllocated) AS MenuExpenses FROM MenuItems";
+    
+    connection.query(expenseMenuQuery, function(menuErr, MenuExpense) {
+        if (menuErr) {
+            console.error('Failed to retrieve menu expenses:', menuErr);
+            return res.status(500).send("Error retrieving menu expenses.");
+        }
+
+        res.render('expenses', { menuItems: MenuExpense });
+    });
+});
