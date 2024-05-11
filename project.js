@@ -589,7 +589,7 @@ app.get('/budget', function(req, res) {
 app.post('/add_budget', function(req, res) {
     const { dinnerBudget, decorationBudget, eventBudget } = req.body;
     const dinnerDescription= "This budget may vary";
-    const decorationDescription= "his budget may or may not vary";
+    const decorationDescription= "This budget may or may not vary";
     const eventDescription= "This budget may vary";
 
     // Inserting the budget data into the Budget table
@@ -619,8 +619,24 @@ app.get('/view_expenses', function(req, res) {
     });
 });
 
+// Open adjust budget page for client
+app.get('/budget_modification', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/modify_budget.html')); 
+});
 
 // Endpoint to adjust budget
 app.post('/adjust_budget', function(req, res) {
-    
+    const { category, adjustment } = req.body;
+    const increase = req.body.increase !== undefined; // Check if increase button is clicked
+    const adjustmentValue = increase ? adjustment : -adjustment;
+    // Updating the budget in the Budget table
+    connection.query('UPDATE Budget SET AllocatedAmount = AllocatedAmount + ? WHERE Category = ?', 
+    [adjustmentValue, category], 
+    function(err, result) {
+        if (err) {
+            console.error('Failed to adjust budget:', err);
+            return res.status(500).send("Error adjusting budget.");
+        }
+        res.send("Budget adjusted successfully.");
+    });
 });
