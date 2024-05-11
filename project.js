@@ -584,6 +584,27 @@ app.get('/budget', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/budget_view.html')); 
 });
 
+
+// Endpoint to add budget
+app.post('/add_budget', function(req, res) {
+    const { dinnerBudget, decorationBudget, eventBudget } = req.body;
+    const dinnerDescription= "This budget may vary";
+    const decorationDescription= "his budget may or may not vary";
+    const eventDescription= "This budget may vary";
+
+    // Inserting the budget data into the Budget table
+    connection.query('INSERT INTO Budget (AllocatedAmount, Category, Description) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?)', 
+    [dinnerBudget, 'Dinner', dinnerDescription, decorationBudget, 'Decoration', decorationDescription, eventBudget, 'Event', eventDescription], 
+    function(err, result) {
+        if (err) {
+            console.error('Failed to add budget:', err);
+            return res.status(500).send("Error adding budget.");
+        }
+        res.send("Budget added successfully.");
+    });
+});
+
+
 // Open expense tracking page for client which will render expenses for menu, events etc
 app.get('/view_expenses', function(req, res) {
     const expenseMenuQuery= "SELECT SUM(BudgetAllocated) AS MenuExpenses FROM MenuItems";
@@ -596,4 +617,10 @@ app.get('/view_expenses', function(req, res) {
 
         res.render('expenses', { menuItems: MenuExpense });
     });
+});
+
+
+// Endpoint to adjust budget
+app.post('/adjust_budget', function(req, res) {
+    
 });
