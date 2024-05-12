@@ -96,21 +96,21 @@ CREATE TABLE IF NOT EXISTS MenuItems (
     ItemName VARCHAR(225) NOT NULL UNIQUE,  
     BudgetAllocated INT
 );
-
+ALTER TABLE MenuItems ADD COLUMN TotalVotes INT NOT NULL DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS StudentSuggestion (
-	StudentID INT NOT NULL,
+	UserID INT NOT NULL,
 	ItemID INT NOT NULL,
-	PRIMARY KEY (StudentID, ItemID),
-	FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+	PRIMARY KEY (UserID, ItemID),
+	FOREIGN KEY (UserID) REFERENCES Students(UserID),
 	FOREIGN KEY (ItemID) REFERENCES MenuItems(ItemID)
 );
 
 CREATE TABLE IF NOT EXISTS RegistersFor(
 	EventID INT NOT NULL,
-    StudentID INT NOT NULL,
-    PRIMARY KEY (StudentID, EventID),
-    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    UserID INT NOT NULL,
+    PRIMARY KEY (UserID, EventID),
+    FOREIGN KEY (UserID) REFERENCES Students(UserID),
     FOREIGN KEY (EventID) REFERENCES Events(EventID)
 );
 
@@ -156,17 +156,62 @@ BEGIN
 	END IF;
 END $$
 DELIMITER ;
-    
+
+-- stored procedure for event budget
+DELIMITER $$
+CREATE PROCEDURE EventBudgetThreshold()
+BEGIN
+	DECLARE TotalAllocated DECIMAL(10, 2);
+    DECLARE EventThreshold DECIMAL(10, 2);
+    SELECT SUM(EventBudget) INTO totalAllocated FROM Events; -- total allocation from event table
+    SELECT AllocatedAmount INTO EventThreshold FROM Budget WHERE Category = 'Event'; -- allocation for events
+    IF TotalAllocated > EventThreshold THEN
+		INSERT INTO Announcements (AnnouncementDetails, AnnouncedBy)
+		VALUES ('Budget threshold exceeded for Events! Keep it low!', 1);
+	END IF;
+END $$
+DELIMITER ;
+
+-- stored procedure for decorations budget
+-- DELIMITER $$
+-- CREATE PROCEDURE DecorationBudgetThreshold()
+-- BEGIN
+-- 	DECLARE TotalAllocated DECIMAL(10, 2);
+--     DECLARE DecorThreshold DECIMAL(10, 2);
+--     SELECT SUM(EventBudget) INTO totalAllocated FROM EventDecoration; -- total allocation from decor table
+--     SELECT AllocatedAmount INTO DecorThreshold FROM Budget WHERE Category = 'Decoration'; -- allocation for decor
+--     IF TotalAllocated > DecorThreshold THEN
+-- 		INSERT INTO Announcements (AnnouncementDetails, AnnouncedBy)
+-- 		VALUES ('Budget threshold exceeded for Events! Keep it low!', 1);
+-- 	END IF;
+-- END $$
+-- DELIMITER ;
+
 CALL MenuBudgetThreshold();
+CALL EventBudgetThreshold();
+-- CALL DecorationBudgetThreshold();
+
+-- trigger to update totalVotes when a new vote is recorded
+DELIMITER $$
+CREATE TRIGGER UpdateVoteCount
+AFTER INSERT ON StudentSuggestion
+FOR EACH ROW
+BEGIN
+    UPDATE MenuItems
+    SET TotalVotes = TotalVotes + 1
+    WHERE ItemID = NEW.ItemID;
+END$$
+DELIMITER ;
 
 
 -- SELECT CONSTRAINT_NAME
 -- FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
--- WHERE TABLE_NAME = 'StudentSuggestion' AND COLUMN_NAME = 'StudentID';
+-- WHERE TABLE_NAME = 'RegistersFor' AND COLUMN_NAME = 'StudentID';
 
---  ALTER TABLE StudentSuggestion DROP FOREIGN KEY studentsuggestion_ibfk_1;
+-- ALTER TABLE StudentSuggestion DROP FOREIGN KEY studentsuggestion_ibfk_1;
 
 -- ALTER TABLE StudentSuggestion ADD FOREIGN KEY (StudentID) REFERENCES Students(StudentID);
+-- SET SQL_SAFE_UPDATES = 1;
 
-
-DELETE FROM MenuItems;
+ALTER TABLE SystemUser ADD CONSTRAINT email_unique UNIQUE (EmailID);
+ALTER TABLE SystemUser ADD CONSTRAINT email_unique UNIQUE (Password);
