@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration Form</title>
+</head>
+<style>
+    /* CSS styling for the buttons and layout */
+    header {
+        background-color: #6A5ACD; /* Dark purple background color */
+        padding: 10px; /* Padding for the header */
+        text-align: center;
+    }
+    header h1 {
+        color: white; /* White text color */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+        font-size: 24px; /* Adjust the font size as needed */
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 10px; /* Padding around the text */
+        margin: 0; /* Remove default margin */
+    }
+    
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-image: url('bg4.png'); /* Replace 'background_image.png' with the path to your PNG image */
+        background-size: cover; /* Cover the entire background */
+        background-position: center; /* Center the background image */
+        font-family: Arial, sans-serif;
+    }
+
+    h2 {
+        text-align: center;
+    }
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button, input[type="submit"] {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #ffffff;
+        color: rgb(8, 8, 8);
+        border: none;
+        border-radius: 50px; /* This creates an oval shape */
+    }
+
+    button:hover, input[type="submit"]:hover {
+        background-color: #8b82c2;
+    }
+    /* Style for the footer */
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #6A5ACD; /* Same color as header */
+        padding: 10px; /* Padding for the footer */
+        text-align: center;
+        color: white; /* White text color */
+        z-index: 999; /* Ensure footer stays on top of other content */
+    }
+
+    /* Style for the text inside the footer */
+    .footer h1 {
+        margin: 0; /* Remove default margin */
+    }
+
+    .footer ul {
+        list-style-type: none; /* Remove bullet points */
+        padding: 0; /* Remove default padding */
+    }
+</style>
+<body>
+    <header>
+        <h1>الوداع</h1>
+    </header>
+    <h2>User Registration Form</h2>
+    <form action="/register_user" method="POST">
+        <!-- Username field -->
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <!-- Password field -->
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <!-- Email ID field -->
+        <label for="email">Email ID:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <!-- Contact number field -->
+        <label for="contactNumber">Contact Number:</label>
+        <input type="text" id="contactNumber" name="contactNumber"><br><br>
+        
+       <!-- Type field (Student or Teacher) -->
+        <label for="type">Type:</label>
+        <select id="type" name="type" required>
+            <option value="" disabled selected>Select</option>
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+        </select><br><br>
+
+
+        <!-- Role field (Actors)-->
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="Senior Student">Senior Student</option>
+            <option value="Dinner Team Manager">Dinner Team Manager</option>
+            <option value="Performance Team Manager">Performance Team Manager</option>
+            <option value="Invitation Team Manager">Invitation Team Manager</option>
+            <option value="Budget Manager">Budget Team Manager</option>
+            <option value="Dinner Team Member">Dinner Team Member</option>
+            <option value="Performance Team Member">Performance Team Member</option>
+            <option value="Invitation Team Member">Invitation Team Member</option>
+            <option value="None">None</option>
+        </select><br><br>
+        
+        <!-- Submit button -->
+        <input type="submit" value="Submit">
+    </form>
+    <div class="footer" id="footer">
+        <h1>GROUP DETAILS</h1>
+        <ul>
+            <li>4TH SEMESTER</li>
+            <li>DATABSE PROJECT </li>
+            <li> FAST-NU,ISLAMABAD</li>
+        </ul>
+    </div>
+    <script>src= 'project.js'</script>
+</body>
+</html>

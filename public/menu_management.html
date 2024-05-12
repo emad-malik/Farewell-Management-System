@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu Management</title>
+    <style>
+        /* CSS styling for form and elements */
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: rgb(8, 8, 8);
+    border: none;
+    border-radius: 50px; /* This creates an oval shape */
+}
+
+button:hover {
+    background-color: #8b82c2;
+}
+
+
+        .hidden {
+            display: none;
+        }
+       
+        /* CSS styling */
+        body {
+            background-color: rgb(249, 249, 250);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('bg4.png'); /* Replace 'background_image.png' with the path to your PNG image */
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+        }
+
+        /* Style for the header */
+        header {
+            background-color: #6A5ACD; /* Dark purple background color */
+            padding: 20px; /* Padding for the header */
+            text-align: center;
+        }
+
+        /* Style for the text inside the header */
+        header h1 {
+            color: white; /* White text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+            font-size: 24px; /* Adjust the font size as needed */
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px; /* Padding around the text */
+            margin: 0; /* Remove default margin */
+        }
+
+        /* Style for the image */
+        .image-container {
+            text-align: center;
+            margin-top: 20px; /* Adjust the gap from the header */
+        }
+         /* Style for the footer */
+         .footer {
+            background-color: #6A5ACD; /* Same color as header */
+            padding: 20px; /* Padding for the footer */
+            text-align: center;
+            color: white; /* White text color */
+        }
+
+        /* Style for the text inside the footer */
+        .footer h1 {
+            margin: 0; /* Remove default margin */
+        }
+
+        .footer ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+        }
+        
+       
+    </style>
+    <script>
+        // Function to show/hide sections based on the user's choice
+        function toggleSections() {
+            const choice = document.querySelector('input[name="choice"]:checked').value;
+            const addSection = document.getElementById('addSection');
+            const deleteSection = document.getElementById('deleteSection');
+            addSection.style.display = (choice === 'add') ? 'block' : 'none';
+            deleteSection.style.display = (choice === 'delete') ? 'block' : 'none';
+        }
+
+    </script>
+</head>
+<body>
+    <header>
+        <h1>الوداع</h1>
+        <nav>
+            <ul>
+               
+                <button><a href="/homepage"> Back to Dashboard  </a> </button>
+            </ul>
+        </nav>
+    </header>
+    <h2>Menu Management</h2>
+    <form action="/modify_menu" method="POST" onsubmit="return validateForm()">
+        <!-- Choice between adding a new item or deleting an existing item -->
+        <div class="section">
+            <label>
+                <input type="radio" name="choice" value="add" id="choiceAdd" onchange="toggleSections()" checked>
+                Add a New Item
+            </label>
+            <label>
+                <input type="radio" name="choice" value="delete" id="choiceDelete" onchange="toggleSections()">
+                Delete Existing Items
+            </label>
+        </div>
+
+        <!-- Section to add new menu item -->
+        <div id="addSection">
+            <h3>Add a New Menu Item</h3>
+            <div class="section">
+                <label for="category">Category:</label>
+                <select name="category" id="category">
+                    <option value="appetizer">Appetizer</option>
+                    <option value="mainCourse">Main Course</option>
+                    <option value="dessert">Dessert</option>
+                    <option value="drinks">Drinks</option>
+                </select>
+            </div>
+            <div class="section">
+                <label for="newItemName">Item Name:</label>
+                <input type="text" name="newItemName" id="newItemName" required>
+            </div>
+            <div class="section">
+                <label for="newItemPrice">Item Price:</label>
+                <input type="text" name="newItemPrice" id="newItemPrice" required>
+            </div>
+        </div>
+
+        <!-- Section to delete existing menu items -->
+        <div id="deleteSection" class="hidden">
+            <h3>Delete Existing Menu Items</h3>
+            <div class="section">
+                <label for="deleteCategory">Category:</label>
+                <select name="deleteCategory" id="deleteCategory">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="appetizer">Appetizer</option>
+                    <option value="mainCourse">Main Course</option>
+                    <option value="dessert">Dessert</option>
+                    <option value="drinks">Drinks</option>
+                </select>
+            </div>
+            <div class="section">
+                <label for="deleteItemName">Item Name:</label>
+                <input type="text" name="deleteItemName" id="deleteItemName">
+            </div>
+        </div>
+
+        <!-- Submit button -->
+        <div class="button-container">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+    <div class="footer" id="footer">
+        <h1>GROUP DETAILS</h1>
+        <ul>
+            <li>4TH SEMESTER</li>
+            <li>DATABSE PROJECT </li>
+            <li> FAST-NU,ISLAMABAD</li>
+            
+        </ul>
+    </div>
+    <script>src= 'project.js'</script>
+</body>
+</html>

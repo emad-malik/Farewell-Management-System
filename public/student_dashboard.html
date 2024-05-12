@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <style>
+        /* CSS styling for the buttons and layout */
+        header {
+            background-color: #6A5ACD; /* Dark purple background color */
+            padding: 10px; /* Padding for the header */
+            text-align: center;
+        }
+        header h1 {
+            color: white; /* White text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+            font-size: 24px; /* Adjust the font size as needed */
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px; /* Padding around the text */
+            margin: 0; /* Remove default margin */
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url('bg4.png'); /* Replace 'background_image.png' with the path to your PNG image */
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            text-align: center;
+        }
+        .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: rgb(8, 8, 8);
+    border: none;
+    border-radius: 50px; /* This creates an oval shape */
+}
+
+button:hover {
+    background-color: #8b82c2;
+}
+        /* Style for the footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #6A5ACD; /* Same color as header */
+            padding: 10px; /* Padding for the footer */
+            text-align: center;
+            color: white; /* White text color */
+            z-index: 999; /* Ensure footer stays on top of other content */
+        }
+
+        /* Style for the text inside the footer */
+        .footer h1 {
+            margin: 0; /* Remove default margin */
+        }
+
+        .footer ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>الوداع</h1>
+    </header>
+    <h2>Student Dashboard</h2>
+    <div class="button-container">
+        <div class="left-buttons">
+            <!-- Button to vote for menu item -->
+            <button onclick="window.location.href='/food_modification'">Vote for Menu Item</button>
+
+            <!-- Button to view final menu -->
+            <button onclick="window.location.href='/final_menu'">View Final Menu</button>
+
+            <!-- Button for events -->
+            <button onclick="window.location.href='/view_events'">View Events</button>
+        </div>
+        <div class="right-buttons">
+           <!-- Button to go to attendance register -->
+        <button onclick="window.location.href='view_attendance'">Attendance Register</button>
+        
+        <!-- Button to view performances -->
+        <button onclick="window.location.href='/view_performance'">Performance Proposal</button>
+
+        <!-- Button to manage performances -->
+        <button onclick="window.location.href='/view_perf_management'">Manage Performance</button>
+
+        <!-- Button to announcements page -->
+        <button onclick="window.location.href='/announcements'">Make Announcements</button>
+
+        <!-- Button to go to task assignment -->
+        <button onclick="window.location.href='/assignments'">Task Assignment</button>
+        
+        <!-- Button to go to updates -->
+        <button onclick="window.location.href='/view_updates'">View Updates</button>
+
+        <!-- Button to manage budget -->
+        <button onclick="window.location.href='/budget'">Manage Budget</button>
+        
+        <!-- Button to send invites -->
+        <button onclick="window.location.href='#'">Send invitations</button>
+
+        <!-- Button to register for event -->
+        <button onclick="window.location.href='studentEvent_reg'">Register For Event</button>
+        </div>
+    </div>
+    <div class="footer" id="footer">
+        <h1>GROUP DETAILS</h1>
+        <ul>
+            <li>4TH SEMESTER</li>
+            <li>DATABSE PROJECT </li>
+            <li> FAST-NU,ISLAMABAD</li>
+        </ul>
+    </div>
+    <script>src= 'project.js'</script>
+</body>
+</html>

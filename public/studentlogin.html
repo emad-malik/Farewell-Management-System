@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    /* CSS styling for the buttons and layout */
+    body {
+            background-color: rgb(249, 249, 250);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('background1.jpg'); 
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+        }
+    header {
+        background-color: #6A5ACD; /* Dark purple background color */
+        padding: 10px; /* Padding for the header */
+        text-align: center;
+    }
+    header h1 {
+        color: white; /* White text color */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+        font-size: 24px; /* Adjust the font size as needed */
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 10px; /* Padding around the text */
+        margin: 0; /* Remove default margin */
+    }
+     /* Style for the footer */
+     .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #6A5ACD; /* Same color as header */
+            padding: 0px; /* Padding for the footer */
+            text-align: center;
+            color: white; /* White text color */
+            z-index: 999; /* Ensure footer stays on top of other content */
+        }
+
+
+        /* Style for the text inside the footer */
+        .footer h1 {
+            margin: 0; /* Remove default margin */
+        }
+
+        .footer ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+        }
+        .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: rgb(8, 8, 8);
+    border: none;
+    border-radius: 50px; /* This creates an oval shape */
+}
+
+button:hover {
+    background-color: #8b82c2;
+}
+             /* CSS styling for the buttons and layout */
+             form {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center items horizontally */
+        }
+    
+        .form-group {
+            margin-bottom: 20px; /* Add margin between form groups */
+            text-align: center; /* Center text within form group */
+        }
+    
+        .form-group label {
+            display: block; /* Make labels block-level elements */
+        }
+    
+        .form-group input {
+            width: 100%; /* Set input width to fill container */
+            padding: 10px; /* Add padding to input */
+            box-sizing: border-box; /* Include padding and border in input width */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>الوداع</h1>
+        <h1>Student Login</h1>
+        <button><a href="/intropg">BACK TO HOMEPAGE</a></button>
+        </div>
+    </header>
+    
+
+    <main>
+        <form action="/student_login" method="POST" class="form-container">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="button">Login</button>
+        </form>
+    </main>
+
+        <div class="footer" id="footer">
+            <h1>GROUP DETAILS</h1>
+            <ul>
+                <li>4TH SEMESTER</li>
+                <li>DATABSE PROJECT </li>
+                <li> FAST-NU,ISLAMABAD</li>
+                
+            </ul>
+        </div>
+        <script>src= 'project.js'</script>
+    
+</body>
+
+</html>

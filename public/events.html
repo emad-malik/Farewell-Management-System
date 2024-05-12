@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration</title>
+    <style>
+        /* CSS styling for the buttons and layout */
+        header {
+            background-color: #6A5ACD; /* Dark purple background color */
+            padding: 10px; /* Padding for the header */
+            text-align: center;
+        }
+        header h1 {
+            color: white; /* White text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+            font-size: 24px; /* Adjust the font size as needed */
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px; /* Padding around the text */
+            margin: 0; /* Remove default margin */
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url('bg4.png'); /* Replace 'background_image.png' with the path to your PNG image */
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+            font-family: Arial, sans-serif;
+        }
+    
+        h2 {
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        button, input[type="submit"] {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: rgb(8, 8, 8);
+            border: none;
+            border-radius: 50px; /* This creates an oval shape */
+        }
+    
+        button:hover, input[type="submit"]:hover {
+            background-color: #8b82c2;
+        }
+        /* Style for the footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #6A5ACD; /* Same color as header */
+            padding: 10px; /* Padding for the footer */
+            text-align: center;
+            color: white; /* White text color */
+            z-index: 999; /* Ensure footer stays on top of other content */
+        }
+    
+        /* Style for the text inside the footer */
+        .footer h1 {
+            margin: 0; /* Remove default margin */
+        }
+    
+        .footer ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>الوداع</h1>
+    </header>
+    <div class="container">
+        <h2>Event Registration</h2>
+        <form action="/register_events" method="POST">
+            <label>
+                <input type="checkbox" name="events[]" value="Qawali">
+                Qawali
+            </label>
+            <label>
+                <input type="checkbox" name="events[]" value="Dance Performance">
+                Dance Performance
+            </label>
+            <label>
+                <input type="checkbox" name="events[]" value="Music Concert">
+                Music Concert
+            </label>
+            <label>
+                <input type="checkbox" name="events[]" value="Comedy Show">
+                Comedy Show
+            </label>
+            <!-- Add more event checkboxes as needed -->
+            <button type="submit">Register</button>
+        </form>
+    </div>
+  
+
+    <script>src= 'project.js'</script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu Selection</title>
+    <style>
+        /* Style for the header */
+        header {
+            background-color: #6A5ACD; /* Dark purple background color */
+            padding: 10px; /* Padding for the header */
+            text-align: center;
+        }
+
+        /* Style for the text inside the header */
+        header h1 {
+            color: white; /* White text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+            font-size: 24px; /* Adjust the font size as needed */
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px; /* Padding around the text */
+            margin: 0; /* Remove default margin */
+        }
+       body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('bg4.png'); 
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+        }
+        .container {
+            background: white;
+            width: 50%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 30px; /* Adjust the gap from the header */
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 20px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #6A5ACD;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #958dca;
+        }
+        
+        /* Style for the footer */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #6A5ACD; /* Same color as header */
+    padding: 10px; /* Add padding for the footer */
+    text-align: center;
+    color: white; /* White text color */
+    z-index: 999; /* Ensure footer stays on top of other content */
+}
+
+/* Style for the text inside the footer */
+.footer h1 {
+    margin: 0; /* Remove default margin */
+}
+
+.footer ul {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0; /* Remove default padding */
+} 
+
+        .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: rgb(8, 8, 8);
+    border: none;
+    border-radius: 50px; /* This creates an oval shape */
+}
+
+button:hover {
+    background-color: #8b82c2;
+}
+        
+    </style>
+    <script>
+        // Function to show/hide sections based on the user's choice
+        function toggleSections() {
+            const choice = document.querySelector('input[name="choice"]:checked').value;
+            const addSection = document.getElementById('addSection');
+            const deleteSection = document.getElementById('deleteSection');
+            addSection.style.display = (choice === 'add') ? 'block' : 'none';
+            deleteSection.style.display = (choice === 'delete') ? 'block' : 'none';
+        }
+    
+        // Function to validate form selections
+        function validateForm() {
+            const appetizerCheckboxes = document.querySelectorAll('input[name="appetizer"]');
+            const mainCourseCheckboxes = document.querySelectorAll('input[name="mainCourse"]');
+            const dessertCheckboxes = document.querySelectorAll('input[name="dessert"]');
+            const drinkCheckboxes = document.querySelectorAll('input[name="drinks"]');
+            const maxAppetizer = 2;
+            const maxMainCourse = 4;
+            const maxDessert = 2;
+            const maxDrink = 2;
+    
+            // Count the selected checkboxes
+            let appetizerCount = 0;
+            appetizerCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    appetizerCount++;
+                }
+            });
+    
+            let mainCourseCount = 0;
+            mainCourseCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    mainCourseCount++;
+                }
+            });
+    
+            let dessertCount = 0;
+            dessertCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    dessertCount++;
+                }
+            });
+    
+            let drinkCount = 0;
+            drinkCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    drinkCount++;
+                }
+            });
+    
+            // Check if the user exceeds the allowed limit
+            if (appetizerCount > maxAppetizer) {
+                alert(`You can select a maximum of ${maxAppetizer} appetizers.`);
+                return false;
+            }
+    
+            if (mainCourseCount > maxMainCourse) {
+                alert(`You can select a maximum of ${maxMainCourse} main courses.`);
+                return false;
+            }
+    
+            if (dessertCount > maxDessert) {
+                alert(`You can select a maximum of ${maxDessert} desserts.`);
+                return false;
+            }
+    
+            if (drinkCount > maxDrink) {
+                alert(`You can select a maximum of ${maxDrink} drinks.`);
+                return false;
+            }
+    
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>الوداع</h1>
+        <nav>
+            <ul> 
+                <button><a href="/homepage"> Back to Home Page  </a> </button>
+            </ul>
+        </nav>
+     
+        </div>
+    </header>
+    <h2>Menu Selection</h2>
+    <form action="/submit_vote" method="POST" onsubmit="return validateForm()">
+        <!-- Appetizer options -->
+        <div class="section">
+            <h3>Appetizer</h3>
+            <label>
+                <input type="checkbox" name="appetizer" value="Russian Salad - Rs.250" id="appetizer1">
+                Russian Salad - Rs.250
+            </label>
+            <label>
+                <input type="checkbox" name="appetizer" value="HOT N SOUR Soup - Rs.450" id="appetizer2">
+                HOT N SOUR Soup - Rs.450
+            </label>
+            <label>
+                <input type="checkbox" name="appetizer" value="Fried Prawns - Rs.850" id="appetizer3">
+                Fried Prawns - Rs.850
+            </label>
+        </div>
+
+        <!-- Main course options -->
+        <div class="section">
+            <h3>Main Course</h3>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Alfredo Pasta - Rs.950" id="mainCourse1">
+                Alfredo Pasta - Rs.950
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Mexican Steak - Rs.1000" id="mainCourse2">
+                Mexican Steak - Rs.1000
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Vegetable Stir Fry - Rs.950" id="mainCourse3">
+                Vegetable Stir Fry - Rs.950
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Chicken Chilli Dry - Rs.1150" id="mainCourse4">
+                Chicken Chilli Dry - Rs.1150
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Fried Fish - Rs.850" id="mainCourse5">
+                Fried Fish - Rs.850
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Chicken Biryani - Rs.750" id="mainCourse6">
+                Chicken Biryani - Rs.750
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Mutton Karahi - Rs.1000" id="mainCourse7">
+                Mutton Karahi - Rs.1000
+            </label>
+            <label>
+                <input type="checkbox" name="mainCourse" value="Mix Vegetable - Rs.650" id="mainCourse8">
+                Mix Vegetable - Rs.650
+            </label>
+        </div>
+
+        <!-- Dessert options -->
+        <div class="section">
+            <h3>Dessert</h3>
+            <label>
+                <input type="checkbox" name="dessert" value="Molten Lava Cake - Rs.550" id="dessert1">
+                Molten Lava Cake - Rs.550
+            </label>
+            <label>
+                <input type="checkbox" name="dessert" value="Ice Cream - Rs.350" id="dessert2">
+                Ice Cream - Rs.350
+            </label>
+            <label>
+                <input type="checkbox" name="dessert" value="Fruit Salad - Rs.350" id="dessert3">
+                Fruit Salad - Rs.350
+            </label>
+        </div>
+
+        <!-- Drink options -->
+        <div class="section">
+            <h3>Drinks</h3>
+            <label>
+                <input type="checkbox" name="drinks" value="Mint Margarita - Rs.350" id="drinks1">
+                Mint Margarita - Rs.350
+            </label>
+            <label>
+                <input type="checkbox" name="drinks" value="Fresh Orange Juice - Rs.350" id="drinks2">
+                Fresh Orange Juice - Rs.350
+            </label>
+            <label>
+                <input type="checkbox" name="drinks" value="Mineral Water - Rs.150" id="drinks3">
+                Mineral Water - Rs.150
+            </label>
+        </div>
+
+        <!-- Submit button -->
+        <div class="button-container">
+            <button type="submit">Submit</button>
+        </div>
+        
+    </form>
+    <script>src= 'project.js'</script>
+</body>
+</html>

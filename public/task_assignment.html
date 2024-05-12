@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Task</title>
+    <style>
+        /* Style for the header */
+        header {
+            background-color: #6A5ACD; /* Dark purple background color */
+            padding: 10px; /* Padding for the header */
+            text-align: center;
+        }
+
+        /* Style for the text inside the header */
+        header h1 {
+            color: white; /* White text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Custom font family */
+            font-size: 24px; /* Adjust the font size as needed */
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 10px; /* Padding around the text */
+            margin: 0; /* Remove default margin */
+        }
+       body {
+            margin: 0;
+            padding: 0;
+            background-image: url('background1.jpg'); /* Replace 'background_image.png' with the path to your PNG image */
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background: white;
+            width: 50%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 30px; /* Adjust the gap from the header */
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 20px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #6A5ACD;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #958dca;
+        }
+        
+         /* Style for the footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #6A5ACD; /* Same color as header */
+            padding: 0px; /* Padding for the footer */
+            text-align: center;
+            color: white; /* White text color */
+            z-index: 999; /* Ensure footer stays on top of other content */
+        }
+
+
+        /* Style for the text inside the footer */
+        .footer h1 {
+            margin: 0; /* Remove default margin */
+        }
+
+        .footer ul {
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+        }
+        .button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: rgb(8, 8, 8);
+    border: none;
+    border-radius: 50px; /* This creates an oval shape */
+}
+
+button:hover {
+    background-color: #8b82c2;
+}
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>الوداع</h1>
+        <nav>
+            <ul>
+               
+                <button><a href="/homepage"> Back to Home Page  </a> </button>
+            </ul>
+        </nav>
+       
+    </header>
+    <div class="container">
+        <h2>Create Task</h2>
+        <form action="/assign_task" method="POST">
+            <label for="taskName">Task Name:</label>
+            <input type="text" id="taskName" name="taskDetails" placeholder="Create a Task.." required>
+
+            <label for="team">Assign to Team:</label>
+            <select id="team" name="assignedTo">
+            <option value="" disabled selected>Select Role</option>
+            <option value="Dinner Team">Dinner Team</option>
+            <option value="Performace Team">Performace Team</option>
+            <option value="Invitation Team">Invitation Team</option>
+            <option value="Budget Team">Budget Team</option>
+            <option value="None">None</option>
+            </select>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+   
+    <script>src= 'project.js'</script>
+</body>
+</html>
