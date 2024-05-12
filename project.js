@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 // Session middleware setup
 app.use(session({
     secret: 'mySystem', 
@@ -273,6 +274,11 @@ app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
 
+// Open main home page for
+app.get('/intropg', function(req, res) {
+    res.sendFile(path.join(__dirname, 'public/homepage.html'));
+});
+
 // Open register page for client
 app.get('/register', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/register.html'));
@@ -458,38 +464,76 @@ app.get('/food_selection', function(req, res) {
 
 
 // Endpoint to handle menu vote submission
+// app.post('/submit_vote', async function(req, res) {
+//     const userID = req.session.studentID;
+//     const items = req.body;
+
+//     try {
+//         // const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+//         // const result = await queryAsync(roleCheckQuery, [userID]);
+
+//         // if (result.length === 0 || (result[0].StudentRole !== 'Dinner Team Manager' && result[0].StudentRole !== 'Dinner Team Member')) {
+//         //     return res.status(403).send("You are not authorized to perform this action.");
+//         // }
+
+//         for (let type in items) {
+//             let itemName = items[type];
+//             let itemBudget = parseInt(itemName.split("- Rs.")[1]); // Extracting price from the string
+//             let itemNameClean = itemName.split("- Rs.")[0];
+
+//             // Insert into MenuItems
+//             const insertQuery = "INSERT INTO MenuItems (ItemName, BudgetAllocated) VALUES (?, ?)";
+//             const insertResult = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
+
+//             // Insert into StudentSuggestion
+//             const suggestionQuery = "INSERT INTO StudentSuggestion (UserID, ItemID) VALUES (?, ?)";
+//             await queryAsync(suggestionQuery, [userID, insertResult.insertId]);
+//         }
+
+//         res.send("Vote successfully recorded!");
+//     } catch (err) {
+//         console.error('Failed to process vote:', err);
+//         res.status(500).send("Error processing your vote.");
+//     }
+// });
+
+// Endpoint to handle menu vote submission
 app.post('/submit_vote', async function(req, res) {
     const userID = req.session.studentID;
     const items = req.body;
 
     try {
-        // const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
-        // const result = await queryAsync(roleCheckQuery, [userID]);
-
-        // if (result.length === 0 || (result[0].StudentRole !== 'Dinner Team Manager' && result[0].StudentRole !== 'Dinner Team Member')) {
-        //     return res.status(403).send("You are not authorized to perform this action.");
-        // }
-
         for (let type in items) {
             let itemName = items[type];
             let itemBudget = parseInt(itemName.split("- Rs.")[1]); // Extracting price from the string
-            let itemNameClean = itemName.split(" - Rs.")[0];
+            let itemNameClean = itemName.split("- Rs.")[0];
 
-            // Insert into MenuItems
-            const insertQuery = "INSERT INTO MenuItems (ItemName, BudgetAllocated) VALUES (?, ?)";
-            const insertResult = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
+            // First, check if the ItemID exists
+            const checkItemQuery = "SELECT COUNT(*) AS count FROM MenuItems WHERE ItemName = ?";
+            const checkItemResult = await queryAsync(checkItemQuery, [itemNameClean]);
+
+            if (checkItemResult[0].count > 0) {
+                // If ItemID exists, update the vote count
+                const updateVoteQuery = "UPDATE MenuItems SET TotalVotes = TotalVotes + 1 WHERE ItemName = ?";
+                await queryAsync(updateVoteQuery, [itemNameClean]);
+            } else {
+                // If ItemID doesn't exist, insert the new item
+                const insertQuery = "INSERT INTO MenuItems (ItemName, BudgetAllocated) VALUES (?, ?)";
+                const insertResult = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
+            }
 
             // Insert into StudentSuggestion
-            const suggestionQuery = "INSERT INTO StudentSuggestion (UserID, ItemID) VALUES (?, ?)";
-            await queryAsync(suggestionQuery, [userID, insertResult.insertId]);
+            const suggestionQuery = "INSERT INTO StudentSuggestion (UserID, ItemID) VALUES (?, (SELECT ItemID FROM MenuItems WHERE ItemName = ?))";
+            await queryAsync(suggestionQuery, [userID, itemNameClean]);
         }
-
-        res.send("Vote successfully recorded!");
+        res.redirect('/homepage');
+        console.log("Vote successfully recorded!");
     } catch (err) {
         console.error('Failed to process vote:', err);
         res.status(500).send("Error processing your vote.");
     }
 });
+
 
 
 // Open task assignment page for client
@@ -653,7 +697,8 @@ app.post('/add_budget', function(req, res) {
             console.error('Failed to add budget:', err);
             return res.status(500).send("Error adding budget.");
         }
-        res.send("Budget added successfully.");
+        console.log("Budget added successfully.");
+        res.redirect('/budget_modification');
     });
 });
 
@@ -690,7 +735,8 @@ app.post('/adjust_budget', function(req, res) {
             console.error('Failed to adjust budget:', err);
             return res.status(500).send("Error adjusting budget.");
         }
-        res.send("Budget adjusted successfully.");
+        console.log("Budget adjusted successfully.");
+        res.redirect('/view_expenses');
     });
 });
 
@@ -741,7 +787,7 @@ app.post('/submit_performance', async (req, res) => {
         await queryAsync(sql, values);
         
         console.log('New performance proposed');
-        res.send('New performance proposed');
+        res.redirect('/homepage');
 
     } catch (err) {
         console.error('Error in proposing performance:', err);
@@ -766,7 +812,7 @@ app.post('/manage_performances', async (req, res) => {
         await queryAsync(updateStatus, [newStatus, performanceID]);
 
         console.log('Performance status updated successfully');
-        res.send(`Performance ID ${performanceID} status changed to ${newStatus}`);
+        res.redirect('/homepage');
 
     } catch (err) {
         console.error('Error updating performance status:', err);
@@ -806,7 +852,7 @@ app.post('/teacher_event_registration', function(req, res) {
             }
 
             console.log('Teacher details updated successfully');
-            res.send('Teacher details updated successfully');
+            res.redirect('/teacher_homepg');
         });
     });
 });
@@ -844,12 +890,12 @@ app.post('/student_event_registration', function(req, res) {
             }
 
             console.log('Student details updated successfully');
-            res.send('Student details updated successfully');
+            res.redirect('/homepage')
         });
     });
 });
 
-app.get('/View_attendance', function (req, res) {
+app.get('/view_attendance', function (req, res) {
     connection.query('SELECT COUNT(*) AS studentCount FROM Students WHERE StuFamilyMembers IS NOT NULL', (err, studentCountResult) => {
         if (err) throw err;
 
@@ -905,5 +951,23 @@ app.post('/register_events', async (req, res) => {
     } catch (err) {
         console.error('Error registering events:', err);
         res.status(500).send("Error registering events");
+    }
+});
+
+// show user the final menu
+app.get('/final_menu', async (req, res) => {
+    try {
+        const finalMenuQuery = "SELECT ItemName, TotalVotes FROM MenuItems ORDER BY TotalVotes DESC LIMIT 5";
+        connection.query(finalMenuQuery, (err, results) => {
+            if (err) {
+                console.error('Error fetching final menu:', err);
+                res.status(500).send("Error fetching final menu.");
+            } else {
+                res.render('final_menu', { menuItems: results });
+            }
+        });
+    } catch (err) {
+        console.error('Error processing final menu request:', err);
+        res.status(500).send("Error processing final menu request.");
     }
 });
