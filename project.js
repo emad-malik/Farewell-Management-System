@@ -389,9 +389,24 @@ app.get('/teacher_homepg', function(req, res) {
     res.sendFile(path.join(__dirname, 'public/teacher_dashboard.html'));
 });
 
-// Open menu management page for client(student)
-app.get('/food_modification', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public/menu_management.html')); 
+// Open menu management page for client 
+app.get('/food_modification', async function(req, res) {
+    const userID = req.session.userID;
+
+    try {
+        // Check if the logged-in user is part of the Dinner Team
+        const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [userID]);
+
+        if (roleResult.length === 0 || (roleResult[0].StudentRole !== 'Dinner Team Manager' && roleResult[0].StudentRole !== 'Dinner Team Member')) {
+            return res.status(403).send("You are not authorized to view this page.");
+        }
+
+        res.sendFile(path.join(__dirname, 'public/menu_management.html'));
+    } catch (err) {
+        console.error('Failed to verify user role:', err);
+        res.status(500).send("Error accessing menu management page.");
+    }
 });
 
 // Endpoint to handle menu modification
@@ -431,34 +446,19 @@ app.get('/food_selection', function(req, res) {
 });
 
 
-// app.post('/submit_vote', function(req, res) {
-//     const studentID = req.session.studentID; 
-//     const items = req.body.itemID;
-
-//     // Handle single and multiple item submissions
-//     const itemIDs = Array.isArray(items) ? items : [items];
-
-//     itemIDs.forEach((itemID) => {
-//         const studentFoodVote = 'INSERT INTO StudentSuggestions (StudentID, ItemID) VALUES (?, ?)';
-//         connection.query(studentFoodVote, [studentID, itemID], function(err, result) {
-//             if (err) {
-//                 console.error('Failed to insert vote:', err);
-//                 return res.status(500).send("Error processing your vote.");
-//             }
-//         });
-//     });
-
-//     res.send("Vote successfully recorded!");
-// });
-
-
-// Endpoint to handle vote submission
+// Endpoint to handle menu vote submission
 app.post('/submit_vote', async function(req, res) {
-    const studentID = req.session.studentID; 
+    const userID = req.session.studentID;
     const items = req.body;
-    console.log("Items Received:", items);
 
     try {
+        const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+        const result = await queryAsync(roleCheckQuery, [userID]);
+
+        if (result.length === 0 || (result[0].StudentRole !== 'Dinner Team Manager' && result[0].StudentRole !== 'Dinner Team Member')) {
+            return res.status(403).send("You are not authorized to perform this action.");
+        }
+
         for (let type in items) {
             let itemName = items[type];
             let itemBudget = parseInt(itemName.split("- Rs.")[1]); // Extracting price from the string
@@ -466,11 +466,11 @@ app.post('/submit_vote', async function(req, res) {
 
             // Insert into MenuItems
             const insertQuery = "INSERT INTO MenuItems (ItemName, BudgetAllocated) VALUES (?, ?)";
-            const result = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
+            const insertResult = await queryAsync(insertQuery, [itemNameClean, itemBudget]);
 
             // Insert into StudentSuggestion
             const suggestionQuery = "INSERT INTO StudentSuggestion (UserID, ItemID) VALUES (?, ?)";
-            await queryAsync(suggestionQuery, [studentID, result.insertId]);
+            await queryAsync(suggestionQuery, [userID, insertResult.insertId]);
         }
 
         res.send("Vote successfully recorded!");
@@ -488,7 +488,6 @@ function queryAsync(query, params) {
         });
     });
 }
-
 
 // Open task assignment page for client
 app.get('/assignments', function(req, res) {
@@ -561,33 +560,62 @@ app.post('/submit_announcement', function(req, res) {
 });
 
 // Open view updates page for client which will render updates and announcements
-app.get('/view_updates', function(req, res) {
-    const taskQuery= "SELECT TaskDetails FROM TaskAssignment";
-    const announcementQuery= "SELECT AnnouncementDetails FROM Announcements";
-    
-    connection.query(taskQuery, function(taskErr, taskResults) {
-        if (taskErr) {
-            console.error('Failed to retrieve tasks:', taskErr);
-            return res.status(500).send("Error retrieving tasks.");
+app.get('/view_updates', async function(req, res) {
+    const userID = req.session.studentID; 
+
+    try {
+        // Check if the logged-in user is a senior student
+        const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [userID]);
+
+        if (roleResult.length === 0 || roleResult[0].StudentRole !== 'Senior Student') {
+            return res.status(403).send("You are not authorized to view this page.");
         }
 
-        connection.query(announcementQuery, function(announcementErr, announcementResults) {
-            if (announcementErr) {
-                console.error('Failed to retrieve announcements:', announcementErr);
-                return res.status(500).send("Error retrieving announcements.");
+        // Queries to get tasks and announcements
+        const taskQuery = "SELECT TaskDetails FROM TaskAssignment";
+        const announcementQuery = "SELECT AnnouncementDetails FROM Announcements";
+        
+        connection.query(taskQuery, function(taskErr, taskResults) {
+            if (taskErr) {
+                console.error('Failed to retrieve tasks:', taskErr);
+                return res.status(500).send("Error retrieving tasks.");
             }
 
-            res.render('updates', { tasks: taskResults, announcements: announcementResults });
+            connection.query(announcementQuery, function(announcementErr, announcementResults) {
+                if (announcementErr) {
+                    console.error('Failed to retrieve announcements:', announcementErr);
+                    return res.status(500).send("Error retrieving announcements.");
+                }
+
+                res.render('updates', { tasks: taskResults, announcements: announcementResults });
+            });
         });
-    });
+    } catch (err) {
+        console.error('Failed to verify user role:', err);
+        res.status(500).send("Error accessing updates page.");
+    }
 });
 
 
 // Open budget page for client
-app.get('/budget', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public/budget_view.html')); 
-});
+app.get('/budget', async function(req, res) {
+    const userID = req.session.userID;
 
+    try {
+        const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [userID]);
+
+        if (roleResult.length === 0 || roleResult[0].Role !== 'Budget Team Manager') {
+            return res.status(403).send("You are not authorized to view this page.");
+        }
+
+        res.sendFile(path.join(__dirname, 'public/budget_view.html'));
+    } catch (err) {
+        console.error('Failed to verify user role:', err);
+        res.status(500).send("Error accessing budget page.");
+    }
+});
 
 // Endpoint to add budget
 app.post('/add_budget', function(req, res) {
@@ -651,64 +679,74 @@ app.get('/view_performance', function (req, res) {
 });
 
 
-// Endpoint to handle proposal submission
-app.post('/submit_performance', (req, res) => {
+// Endpoint to handle proposal submission with role check
+app.post('/submit_performance', async (req, res) => {
     const { title, duration, specialRequirements } = req.body;
     const studentID = req.session.studentID; 
 
-    // Check if the studentID exists in the Students table
-    const checkStudentSql = 'SELECT 1 FROM Students WHERE UserID = ?';
-    connection.query(checkStudentSql, [studentID], (err, result) => {
-        if (err) {
-            console.error('Database error while checking student:', err);
-            res.status(500).send('Error checking student');
-            return;
-        }
+    try {
+        // Check if the logged-in user is a student
+        const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [studentID]);
 
-        if (result.length === 0) {
+        if (roleResult.length === 0) {
             res.status(404).send('Student not found');
             return;
         }
 
-        // Insert performance if student exists
+        // Allow only certain student roles to submit performances
+        if (roleResult[0].StudentRole !== 'Performance Team Manager' && roleResult[0].StudentRole !== 'Performance Team Member') {
+            return res.status(403).send("You are not authorized to perform this action.");
+        }
+
+        // Insert performance if student exists and is authorized
         const sql = 'INSERT INTO Performance (Title, Duration, Special_Requirements, PerformanceStatus, UserID) VALUES (?, ?, ?, ?, ?)';
         const values = [title, duration, specialRequirements, 'Proposed', studentID];
+        await queryAsync(sql, values);
+        
+        console.log('New performance proposed');
+        res.send('New performance proposed');
 
-        connection.query(sql, values, (err, result) => {
-            if (err) {
-                console.error('Database error while inserting performance:', err);
-                res.status(500).send('Error inserting performance');
-                return;
-            }
-            console.log('New performance proposed');
-            res.send('New performance proposed');
-        });
-    });
+    } catch (err) {
+        console.error('Error in proposing performance:', err);
+        res.status(500).send('Error proposing performance');
+    }
 });
+
 
 // Open manage performance page for client
 app.get('/view_perf_management', function (req, res) {
     res.sendFile(path.join(__dirname, 'public/manage_performance.html'));
 });
 
-// Endpoint to handle performance management
-app.post('/manage_performances', function (req, res) {
+// Endpoint to handle performance management with role check
+app.post('/manage_performances', async (req, res) => {
     const performanceID = req.body.performanceID;
     const newStatus = req.body.status;
+    const userID = req.session.userID;
 
-    // Updating performance status using UPDATE query
-    const updateStatus = `UPDATE Performance SET PerformanceStatus = ? WHERE PerformanceID = ?`;
+    try {
+        // Check if the logged-in user has the role to manage performances
+        const roleCheckQuery = "SELECT StudentRole FROM Students WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [userID]);
 
-    connection.query(updateStatus, [newStatus, performanceID], (err, result) => {
-        if (err) {
-            console.error('Error updating performance status: ' + err.message);
-            res.status(500).send('Error updating performance status');
-            return;
+        if (roleResult[0].Role !== 'Performance Team Manager' && roleResult[0].Role !== 'Performance Team Member') {
+            return res.status(403).send("You are not authorized to manage performances.");
         }
+
+        // Update performance status if user is authorized
+        const updateStatus = `UPDATE Performance SET PerformanceStatus = ? WHERE PerformanceID = ?`;
+        await queryAsync(updateStatus, [newStatus, performanceID]);
+
         console.log('Performance status updated successfully');
         res.send(`Performance ID ${performanceID} status changed to ${newStatus}`);
-    });
+
+    } catch (err) {
+        console.error('Error updating performance status:', err);
+        res.status(500).send('Error updating performance status');
+    }
 });
+
 
 
 // Open event reg event page for teacher
