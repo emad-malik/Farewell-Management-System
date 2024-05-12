@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updates</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100vh; /* Full height */
+        }
+        .half {
+            flex: 1; /* Each half takes equal space */
+            padding: 20px;
+            overflow-y: auto; /* Adds scroll to each section if content overflows */
+        }
+        .announcements {
+            background-color: #f8f8f8;
+        }
+        .tasks {
+            background-color: #e8e8e8;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        p {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="half announcements">
+            <h2>Announcements</h2>
+            <% announcements.forEach(function(announcement) { %>
+                <p><%= announcement.AnnouncementDetails %></p>
+            <% }); %>
+        </div>
+        <div class="half tasks">
+            <h2>Tasks Assigned</h2>
+            <% tasks.forEach(function(task) { %>
+                <p><%= task.TaskDetails %></p>
+            <% }); %>
+        </div>
+    </div>
+</body>
+</html>
