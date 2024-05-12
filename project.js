@@ -490,8 +490,26 @@ function queryAsync(query, params) {
 }
 
 // Open task assignment page for client
-app.get('/assignments', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public/task_assignment.html')); 
+app.get('/assignments', async function(req, res) {
+    const userID = req.session.userID; // assuming the user ID is stored in session when they log in
+
+    try {
+        // Check if the logged-in user is a manager of any authorized team
+        const roleCheckQuery = "SELECT Role FROM SystemUser WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [userID]);
+
+        // Define the authorized roles
+        const authorizedRoles = ['Dinner Team Manager', 'Performance Team Manager', 'Invitation Team Manager', 'Budget Team Manager'];
+
+        if (roleResult.length === 0 || !authorizedRoles.includes(roleResult[0].Role)) {
+            return res.status(403).send("You are not authorized to view this page.");
+        }
+
+        res.sendFile(path.join(__dirname, 'public/task_assignment.html'));
+    } catch (err) {
+        console.error('Failed to verify user role:', err);
+        res.status(500).send("Error accessing task assignment page.");
+    }
 });
 
 // Endpoint to handle task assignment
@@ -674,10 +692,25 @@ app.post('/adjust_budget', function(req, res) {
 });
 
 // Open performance proposal page for client
-app.get('/view_performance', function (req, res) {
-    res.sendFile(path.join(__dirname, 'public/propose_performance.html'));
-});
+app.get('/view_performance', async function(req, res) {
+    const userID = req.session.userID; // assuming the user ID is stored in session when they log in
 
+    try {
+        // Check if the logged-in user is a part of the performance team
+        const roleCheckQuery = "SELECT Role FROM SystemUser WHERE UserID = ?";
+        const roleResult = await queryAsync(roleCheckQuery, [userID]);
+
+        // Check if the user has the required role
+        if (roleResult.length === 0 || (roleResult[0].Role !== 'Performance Team Manager' && roleResult[0].Role !== 'Performance Team Member')) {
+            return res.status(403).send("You are not authorized to view this page.");
+        }
+
+        res.sendFile(path.join(__dirname, 'public/propose_performance.html'));
+    } catch (err) {
+        console.error('Failed to verify user role:', err);
+        res.status(500).send("Error accessing performance proposal page.");
+    }
+});
 
 // Endpoint to handle proposal submission with role check
 app.post('/submit_performance', async (req, res) => {
