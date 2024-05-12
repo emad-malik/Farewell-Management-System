@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS MenuItems (
 );
 ALTER TABLE MenuItems ADD COLUMN TotalVotes INT NOT NULL DEFAULT 0;
 
+
 CREATE TABLE IF NOT EXISTS StudentSuggestion (
 	UserID INT NOT NULL,
 	ItemID INT NOT NULL,
@@ -194,19 +195,30 @@ CALL EventBudgetThreshold();
 -- trigger to update totalVotes when a new vote is recorded
 DELIMITER $$
 CREATE TRIGGER UpdateVoteCount
-AFTER INSERT ON StudentSuggestion
+BEFORE INSERT ON StudentSuggestion
 FOR EACH ROW
 BEGIN
-    UPDATE MenuItems
-    SET TotalVotes = TotalVotes + 1
-    WHERE ItemID = NEW.ItemID;
+    DECLARE itemExists INT;
+    SET itemExists = (SELECT COUNT(*) FROM MenuItems WHERE ItemID = NEW.ItemID);
+    IF itemExists > 0 THEN
+        UPDATE MenuItems
+        SET TotalVotes = TotalVotes + 1
+        WHERE ItemID = NEW.ItemID;
+        
+        -- Prevent insertion by setting the new vote's primary key to NULL
+        SET NEW.ItemID = NULL;
+    END IF;
 END$$
 DELIMITER ;
+
 
 
 -- SELECT CONSTRAINT_NAME
 -- FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
 -- WHERE TABLE_NAME = 'RegistersFor' AND COLUMN_NAME = 'StudentID';
+
+
+-- SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'MenuItmes';
 
 -- ALTER TABLE StudentSuggestion DROP FOREIGN KEY studentsuggestion_ibfk_1;
 
